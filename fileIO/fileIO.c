@@ -8,10 +8,12 @@ int main(){
 	FILE* output; 
 
 	//open the input and output file
-	if(input = fopen("TestInput2.txt", "r") == NULL){
+	input = fopen("TestInput.txt", "r"); 
+	if(input == NULL){
 		printf("An error occurred when attempting to open the input file. Exiting."); 
 		exit(1);
-	}; 
+	}
+	output = fopen("out.txt", "a");
 	if(output == NULL){
 		printf("An error occurred when attempting to open the output file. Exiting."); 
 		exit(1);
@@ -159,21 +161,66 @@ void writeFile(FILE* input, FILE* output){
 				modelBuf[strcspn(modelBuf, "\n")] = '\0';
 				VINBuf[strcspn(VINBuf, "\n")] = '\0';
 				rearConfigBuf[strcspn(rearConfigBuf, "\n")] = '\0';
+
 				//these don't need to have newline stripped, but they need to be converted to int
 		       		int year = strtol(yearBuf, &tmp, 10);
-				int numDoors = strtol(numDoorsBuf, &tmp, 10);
-
-				printf("Make: %s\tModel: %s\tYear: %d\tVIN: %s\tDoors: %d\tRearConfig %s\n", makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
+				int numDoors = strtol(numDoorsBuf, &tmp, 10); 
 
 				Car* car = createCar(makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
 				printCarInfo(output, car);
 			}		
 				break; 
-			case 1: 
+			case 1:{
+				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
+				char numDoorsBuf[50]; char VINBuf[50]; char towingCapacityBuf[50];
+				
+				//grab the values
+				fgets(makeBuf, 50, input);
+				fgets(modelBuf, 50, input); 
+				fgets(yearBuf, 50, input);
+				fgets(VINBuf, 50, input); 
+				fgets(numDoorsBuf, 50, input);
+				fgets(towingCapacityBuf, 50, input);
+				
+				//strip the newline chars off the strings so they're formatted correctly
+				makeBuf[strcspn(makeBuf, "\n")] = '\0';
+				modelBuf[strcspn(modelBuf, "\n")] = '\0';
+				VINBuf[strcspn(VINBuf, "\n")] = '\0';
+		
+				//these don't need to have newline stripped, but they need to be converted to int
+		       		int year = strtol(yearBuf, &tmp, 10);
+				int numDoors = strtol(numDoorsBuf, &tmp, 10);
+				double towingCapacity = strtod(towingCapacityBuf, &tmp); 
+
+				Truck* truck = createTruck(makeBuf, modelBuf, year, VINBuf, numDoors, towingCapacity);
+				printTruckInfo(output, truck);
+			}		
 				break; 
-			case 2: 
+			case 2:{
+				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
+				char VINBuf[50]; char motorBuf[50];
+				
+				//grab the values
+				fgets(makeBuf, 50, input);
+				fgets(modelBuf, 50, input); 
+				fgets(yearBuf, 50, input);
+				fgets(VINBuf, 50, input); 
+				fgets(motorBuf, 50, input);
+				
+				//strip the newline chars off the strings so they're formatted correctly
+				makeBuf[strcspn(makeBuf, "\n")] = '\0';
+				modelBuf[strcspn(modelBuf, "\n")] = '\0';
+				VINBuf[strcspn(VINBuf, "\n")] = '\0';
+				motorBuf[strcspn(motorBuf, "\n")] = '\0';
+				//these don't need to have newline stripped, but they need to be converted to int
+		       		int year = strtol(yearBuf, &tmp, 10);
+
+				Boat* boat = createBoat(makeBuf, modelBuf, year, VINBuf, motorBuf);
+				printBoatInfo(output, boat);
+			}		
 				break; 
 			default: 
+				printf("Error: could not extract a valid type from the read operation\n"); 
 				break; 
 			
 		}
