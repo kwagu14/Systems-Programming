@@ -3,26 +3,21 @@
 
 
 int main(){
-
-	//open file
-	//read line by line
-	//switch statement for car, truck, or boat
-
-
-	Vehicle v1 = convertToEnum("car");
-	Vehicle v2 = convertToEnum("truck"); 
-	Vehicle v3 = convertToEnum("boat"); 
-
-	printf("car: %d\ttruck: %d\tboat: %d\n", v1, v2, v3);
-
-	Car* car1 = createCar("Tesla", "Model S", 2021, "0qa948trldfjasdf8", 4, "trunk");
-	Truck* truck1 = createTruck("Ford", "F-150 XLT", 2022, "aero8qwaejfalskdf", 2, 1.5);
-	Boat* boat1 = createBoat("Yamaha", "190 FSH", 2016, "sdluaw43rjearfaod", "inboard");
 	
-	FILE* fp = fopen("out.txt", "a"); 
-	printCarInfo(fp, car1); 
-	printTruckInfo(fp, truck1); 
-	printBoatInfo(fp, boat1); 
+	FILE* input; 
+	FILE* output; 
+
+	//open the input and output file
+	if(input = fopen("TestInput2.txt", "r") == NULL){
+		printf("An error occurred when attempting to open the input file. Exiting."); 
+		exit(1);
+	}; 
+	if(output == NULL){
+		printf("An error occurred when attempting to open the output file. Exiting."); 
+		exit(1);
+	}
+	//format and write contents into output
+       	writeFile(input, output); 	
 		
 
 	return 0;
@@ -32,7 +27,7 @@ int main(){
 
 //constructors
 Car* createCar(char* make, char* model, int year, char* VIN, int numDoors, char* rearConfig){
-
+	
 	Car* newCar = (Car *) malloc(sizeof(Car));
 	newCar -> make = (char *) malloc(50 * sizeof(char));
 	newCar -> model = (char *) malloc(50 * sizeof(char));
@@ -102,7 +97,7 @@ Vehicle convertToEnum(char* str){
 		vehicleType = boat;
 	}else{
 		printf("error: invalid vehicle type found in file. Allowed types: car, truck, boat. Exiting..\n");
-	       	exit(1); 	
+	       	exit(1);
 	}
 
 	return vehicleType;
@@ -133,4 +128,55 @@ void printBoatInfo(FILE* fp, Boat* boat){
 	fprintf(fp, "VIN: %s\n", boat->VIN); 
 	fprintf(fp, "Motor: %s\n\n", boat->motorType);
 	
+}
+
+
+void writeFile(FILE* input, FILE* output){
+	
+	char* tmp;
+	char vehicleStr[50];
+	while(fgets(vehicleStr, 50, input) != NULL && strcmp(vehicleStr, "\n") != 0){
+		
+		//strip newline character
+		vehicleStr[strcspn(vehicleStr, "\n")] = '\0'; 
+		Vehicle vehicleType = convertToEnum(vehicleStr); 	
+
+		switch(vehicleType){
+			case 0:{
+				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
+				char numDoorsBuf[50]; char VINBuf[50]; char rearConfigBuf[50];
+				
+				//grab the values
+				fgets(makeBuf, 50, input);
+				fgets(modelBuf, 50, input); 
+				fgets(yearBuf, 50, input);
+				fgets(VINBuf, 50, input); 
+				fgets(numDoorsBuf, 50, input);
+				fgets(rearConfigBuf, 50, input);
+				
+				//strip the newline chars off the strings so they're formatted correctly
+				makeBuf[strcspn(makeBuf, "\n")] = '\0';
+				modelBuf[strcspn(modelBuf, "\n")] = '\0';
+				VINBuf[strcspn(VINBuf, "\n")] = '\0';
+				rearConfigBuf[strcspn(rearConfigBuf, "\n")] = '\0';
+				//these don't need to have newline stripped, but they need to be converted to int
+		       		int year = strtol(yearBuf, &tmp, 10);
+				int numDoors = strtol(numDoorsBuf, &tmp, 10);
+
+				printf("Make: %s\tModel: %s\tYear: %d\tVIN: %s\tDoors: %d\tRearConfig %s\n", makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
+
+				Car* car = createCar(makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
+				printCarInfo(output, car);
+			}		
+				break; 
+			case 1: 
+				break; 
+			case 2: 
+				break; 
+			default: 
+				break; 
+			
+		}
+	}
+
 }

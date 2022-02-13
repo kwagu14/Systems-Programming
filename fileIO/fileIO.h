@@ -4,7 +4,7 @@
 
 
 
-//structs
+//structs; not necessary for program but added for extendability
 typedef struct Car{
 
         char* make;
@@ -64,4 +64,4 @@ void printTruckInfo(FILE* fp, Truck* truck);
 
 void printBoatInfo(FILE* fp, Boat* boat); 
 
-
+void writeFile(FILE* input, FILE* output); 
