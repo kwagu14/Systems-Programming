@@ -45,6 +45,13 @@ typedef struct Boat{
 typedef enum Vehicle {car, truck, boat} Vehicle;
 
 
+//deallocators
+void freeCar(Car* car); 
+
+void freeTruck(Truck* truck); 
+
+void freeBoat(Boat* boat);
+
 
 //constructors
 

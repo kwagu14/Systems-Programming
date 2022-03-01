@@ -19,69 +19,14 @@ int main(){
 		exit(1);
 	}
 	//format and write contents into output
-       	writeFile(input, output); 	
+       	writeFile(input, output); 
+
+	//close the two files
+	fclose(input); 
+	fclose(output);	
 		
 
 	return 0;
-}
-
-
-
-//constructors
-Car* createCar(char* make, char* model, int year, char* VIN, int numDoors, char* rearConfig){
-	
-	Car* newCar = (Car *) malloc(sizeof(Car));
-	newCar -> make = (char *) malloc(50 * sizeof(char));
-	newCar -> model = (char *) malloc(50 * sizeof(char));
-	newCar -> VIN = (char *) malloc(50 * sizeof(char));
-	newCar -> rearConfig = (char *) malloc(50 * sizeof(char)); 	
-
-	strcpy(newCar -> make, make);
-	strcpy(newCar -> model, model); 
-	strcpy(newCar -> VIN, VIN);
-       	strcpy(newCar -> rearConfig, rearConfig); 	
-	newCar -> year = year; 
-	newCar -> numDoors = numDoors; 
-
-}
-
-
-
-
-Truck* createTruck(char* make, char* model, int year, char* VIN, int numDoors, double towingCapacity){
-
-	Truck* newTruck = (Truck *) malloc(sizeof(Truck));
-	newTruck -> make = (char *) malloc(50 * sizeof(char));
-	newTruck -> model = (char *) malloc(50 * sizeof(char));
-	newTruck -> VIN = (char *) malloc(50 * sizeof(char)); 	
-
-	strcpy(newTruck -> make, make);
-	strcpy(newTruck -> model, model); 
-	strcpy(newTruck -> VIN, VIN); 	
-	newTruck -> year = year; 
-	newTruck -> numDoors = numDoors;
-       	newTruck -> towingCapacity = towingCapacity;
-
-}
-
-
-
-Boat* createBoat(char* make, char* model, int year, char* VIN, char* motorType){
-	
-	Boat* newBoat = (Boat *) malloc(sizeof(Boat));
-	newBoat -> make = (char *) malloc(50 * sizeof(char));
-	newBoat -> model = (char *) malloc(50 * sizeof(char));
-	newBoat -> VIN = (char *) malloc(50 * sizeof(char));
-	newBoat -> motorType = (char *) malloc(50 * sizeof(char)); 	
-
-	strcpy(newBoat -> make, make);
-	strcpy(newBoat -> model, model); 
-	strcpy(newBoat -> VIN, VIN);
-       	strcpy(newBoat -> motorType, motorType); 	
-	newBoat -> year = year; 
-
-
-
 }
 
 
@@ -135,7 +80,6 @@ void printBoatInfo(FILE* fp, Boat* boat){
 
 void writeFile(FILE* input, FILE* output){
 	
-	char* tmp;
 	char vehicleStr[50];
 	while(fgets(vehicleStr, 50, input) != NULL && strcmp(vehicleStr, "\n") != 0){
 		
@@ -163,11 +107,12 @@ void writeFile(FILE* input, FILE* output){
 				rearConfigBuf[strcspn(rearConfigBuf, "\n")] = '\0';
 
 				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = strtol(yearBuf, &tmp, 10);
-				int numDoors = strtol(numDoorsBuf, &tmp, 10); 
+		       		int year = atoi(yearBuf);
+				int numDoors = atoi(numDoorsBuf); 
 
 				Car* car = createCar(makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
 				printCarInfo(output, car);
+				freeCar(car);
 			}		
 				break; 
 			case 1:{
@@ -188,12 +133,13 @@ void writeFile(FILE* input, FILE* output){
 				VINBuf[strcspn(VINBuf, "\n")] = '\0';
 		
 				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = strtol(yearBuf, &tmp, 10);
-				int numDoors = strtol(numDoorsBuf, &tmp, 10);
-				double towingCapacity = strtod(towingCapacityBuf, &tmp); 
+		       		int year = atoi(yearBuf);
+				int numDoors = atoi(numDoorsBuf);
+				double towingCapacity = atof(towingCapacityBuf); 
 
 				Truck* truck = createTruck(makeBuf, modelBuf, year, VINBuf, numDoors, towingCapacity);
 				printTruckInfo(output, truck);
+				freeTruck(truck);
 			}		
 				break; 
 			case 2:{
@@ -213,10 +159,11 @@ void writeFile(FILE* input, FILE* output){
 				VINBuf[strcspn(VINBuf, "\n")] = '\0';
 				motorBuf[strcspn(motorBuf, "\n")] = '\0';
 				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = strtol(yearBuf, &tmp, 10);
+		       		int year = atoi(yearBuf);
 
 				Boat* boat = createBoat(makeBuf, modelBuf, year, VINBuf, motorBuf);
 				printBoatInfo(output, boat);
+				freeBoat(boat);
 			}		
 				break; 
 			default: 
@@ -227,3 +174,95 @@ void writeFile(FILE* input, FILE* output){
 	}
 
 }
+
+
+
+//STRUCT CREATORS AND DEALLOCATORS
+//(not necessary for assignment, but these were kept anyawy in case program is extended to use data structures instead of files in the future)
+
+//deallocators for the structs
+void freeCar(Car* car){
+	//deallocate the string arrays
+	free(car -> make);
+	free(car -> model);
+	free(car -> VIN);
+	free(car -> rearConfig);
+	//deallocate the struct
+	free(car);
+}
+
+void freeTruck(Truck* truck){
+	free(truck -> make);
+	free(truck -> model);
+	free(truck -> VIN); 
+	free(truck);
+}
+
+void freeBoat(Boat* boat){
+	free(boat -> make);
+	free(boat -> model); 
+	free(boat -> VIN); 
+	free(boat -> motorType); 
+	free(boat); 
+}
+
+
+
+//constructors
+Car* createCar(char* make, char* model, int year, char* VIN, int numDoors, char* rearConfig){
+	
+	Car* newCar = (Car *) malloc(sizeof(Car));
+	newCar -> make = (char *) malloc(50 * sizeof(char));
+	newCar -> model = (char *) malloc(50 * sizeof(char));
+	newCar -> VIN = (char *) malloc(50 * sizeof(char));
+	newCar -> rearConfig = (char *) malloc(50 * sizeof(char)); 	
+
+	strcpy(newCar -> make, make);
+	strcpy(newCar -> model, model); 
+	strcpy(newCar -> VIN, VIN);
+       	strcpy(newCar -> rearConfig, rearConfig); 	
+	newCar -> year = year; 
+	newCar -> numDoors = numDoors; 
+	return newCar;
+
+}
+
+
+
+
+Truck* createTruck(char* make, char* model, int year, char* VIN, int numDoors, double towingCapacity){
+
+	Truck* newTruck = (Truck *) malloc(sizeof(Truck));
+	newTruck -> make = (char *) malloc(50 * sizeof(char));
+	newTruck -> model = (char *) malloc(50 * sizeof(char));
+	newTruck -> VIN = (char *) malloc(50 * sizeof(char)); 	
+
+	strcpy(newTruck -> make, make);
+	strcpy(newTruck -> model, model); 
+	strcpy(newTruck -> VIN, VIN); 	
+	newTruck -> year = year; 
+	newTruck -> numDoors = numDoors;
+       	newTruck -> towingCapacity = towingCapacity;
+	return newTruck;
+}
+
+
+
+Boat* createBoat(char* make, char* model, int year, char* VIN, char* motorType){
+	
+	Boat* newBoat = (Boat *) malloc(sizeof(Boat));
+	newBoat -> make = (char *) malloc(50 * sizeof(char));
+	newBoat -> model = (char *) malloc(50 * sizeof(char));
+	newBoat -> VIN = (char *) malloc(50 * sizeof(char));
+	newBoat -> motorType = (char *) malloc(50 * sizeof(char)); 	
+
+	strcpy(newBoat -> make, make);
+	strcpy(newBoat -> model, model); 
+	strcpy(newBoat -> VIN, VIN);
+       	strcpy(newBoat -> motorType, motorType); 	
+	newBoat -> year = year; 
+
+	return newBoat;
+
+}
+
