@@ -1,5 +1,12 @@
+#ifndef FILEIO_H
+#define FILEIO_H
 #include "fileIO.h"
+#endif
 
+#ifndef UTILS_H
+#define UTILS_H
+#include "utils.h"
+#endif
 
 
 int main(){
@@ -66,7 +73,7 @@ void printTruckInfo(FILE* fp, Truck* truck){
 	fprintf(fp, "%d %s %s\n", truck->year, truck->make, truck->model); 
 	fprintf(fp, "VIN: %s\n", truck->VIN); 
 	fprintf(fp, "Doors: %d\n", truck->numDoors); 
-	fprintf(fp, "Max Towing Capacity: %f\n\n", truck->towingCapacity); 
+	fprintf(fp, "Max Towing Capacity: %.2f\n\n", truck->towingCapacity); 
 	
 }
 
@@ -84,31 +91,20 @@ void writeFile(FILE* input, FILE* output){
 	while(fgets(vehicleStr, 50, input) != NULL && strcmp(vehicleStr, "\n") != 0){
 		
 		//strip newline character
-		vehicleStr[strcspn(vehicleStr, "\n")] = '\0'; 
+		removeEndingNewline(vehicleStr); 
 		Vehicle vehicleType = convertToEnum(vehicleStr); 	
 
 		switch(vehicleType){
 			case 0:{
-				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
-				char numDoorsBuf[50]; char VINBuf[50]; char rearConfigBuf[50];
+				char makeBuf[50]; char modelBuf[50];
+				char VINBuf[50]; char rearConfigBuf[50];
 				
-				//grab the values
-				fgets(makeBuf, 50, input);
-				fgets(modelBuf, 50, input); 
-				fgets(yearBuf, 50, input);
-				fgets(VINBuf, 50, input); 
-				fgets(numDoorsBuf, 50, input);
-				fgets(rearConfigBuf, 50, input);
-				
-				//strip the newline chars off the strings so they're formatted correctly
-				makeBuf[strcspn(makeBuf, "\n")] = '\0';
-				modelBuf[strcspn(modelBuf, "\n")] = '\0';
-				VINBuf[strcspn(VINBuf, "\n")] = '\0';
-				rearConfigBuf[strcspn(rearConfigBuf, "\n")] = '\0';
-
-				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = atoi(yearBuf);
-				int numDoors = atoi(numDoorsBuf); 
+				grabString(input, makeBuf); 
+				grabString(input, modelBuf);
+				int year = grabInteger(input); 
+				grabString(input, VINBuf); 
+				int numDoors = grabInteger(input); 
+				grabString(input, rearConfigBuf); 	
 
 				Car* car = createCar(makeBuf, modelBuf, year, VINBuf, numDoors, rearConfigBuf);
 				printCarInfo(output, car);
@@ -116,26 +112,15 @@ void writeFile(FILE* input, FILE* output){
 			}		
 				break; 
 			case 1:{
-				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
-				char numDoorsBuf[50]; char VINBuf[50]; char towingCapacityBuf[50];
+				char makeBuf[50]; char modelBuf[50]; 
+				char numDoorsBuf[50]; char VINBuf[50];
 				
-				//grab the values
-				fgets(makeBuf, 50, input);
-				fgets(modelBuf, 50, input); 
-				fgets(yearBuf, 50, input);
-				fgets(VINBuf, 50, input); 
-				fgets(numDoorsBuf, 50, input);
-				fgets(towingCapacityBuf, 50, input);
-				
-				//strip the newline chars off the strings so they're formatted correctly
-				makeBuf[strcspn(makeBuf, "\n")] = '\0';
-				modelBuf[strcspn(modelBuf, "\n")] = '\0';
-				VINBuf[strcspn(VINBuf, "\n")] = '\0';
-		
-				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = atoi(yearBuf);
-				int numDoors = atoi(numDoorsBuf);
-				double towingCapacity = atof(towingCapacityBuf); 
+				grabString(input, makeBuf); 
+				grabString(input, modelBuf); 
+				int year = grabInteger(input); 
+				grabString(input, VINBuf); 
+				int numDoors = grabInteger(input);
+				double towingCapacity = grabFloat(input);
 
 				Truck* truck = createTruck(makeBuf, modelBuf, year, VINBuf, numDoors, towingCapacity);
 				printTruckInfo(output, truck);
@@ -143,23 +128,14 @@ void writeFile(FILE* input, FILE* output){
 			}		
 				break; 
 			case 2:{
-				char makeBuf[50]; char modelBuf[50]; char yearBuf[50];
+				char makeBuf[50]; char modelBuf[50];
 				char VINBuf[50]; char motorBuf[50];
 				
-				//grab the values
-				fgets(makeBuf, 50, input);
-				fgets(modelBuf, 50, input); 
-				fgets(yearBuf, 50, input);
-				fgets(VINBuf, 50, input); 
-				fgets(motorBuf, 50, input);
-				
-				//strip the newline chars off the strings so they're formatted correctly
-				makeBuf[strcspn(makeBuf, "\n")] = '\0';
-				modelBuf[strcspn(modelBuf, "\n")] = '\0';
-				VINBuf[strcspn(VINBuf, "\n")] = '\0';
-				motorBuf[strcspn(motorBuf, "\n")] = '\0';
-				//these don't need to have newline stripped, but they need to be converted to int
-		       		int year = atoi(yearBuf);
+				grabString(input, makeBuf); 
+				grabString(input, modelBuf);
+			       	int year = grabInteger(input); 	
+				grabString(input, VINBuf); 
+				grabString(input, motorBuf); 	
 
 				Boat* boat = createBoat(makeBuf, modelBuf, year, VINBuf, motorBuf);
 				printBoatInfo(output, boat);

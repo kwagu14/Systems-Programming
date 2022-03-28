@@ -1,8 +1,17 @@
+#ifndef STRING_H
+#define STRING_H
+#include <string.h>
+#endif
+
+#ifndef STDIO_H
+#define STDIO_H
 #include <stdio.h>
+#endif
+
+#ifndef STDLIB_H
+#define STDLIB_H
 #include <stdlib.h>
-#include <string.h> 
-
-
+#endif
 
 //structs; not necessary for program but added for extendability
 typedef struct Car{

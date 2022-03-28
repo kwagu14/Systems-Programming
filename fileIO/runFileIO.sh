@@ -1,4 +1,5 @@
 #!/bin/bash
 
-gcc fileIO.c -o fileIO
+rm out.txt
+gcc fileIO.c utils.c -o fileIO
 ./fileIO
