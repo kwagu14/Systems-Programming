@@ -33,6 +33,9 @@ int main(){
 	FILE* input;
 	FILE* output;
 	
+	//holds the current string array size
+	int arraySize;
+	
 	//malloc an array of char pointers that has an initial length of 10
 	char** stringsArray = (char**) malloc(10 * sizeof(char*)); 
 	
@@ -40,30 +43,25 @@ int main(){
 	for(int i = 0; i<10; i++){
 		//create a string that can hold 100 elements
 		stringsArray[i] = (char*) malloc(101 * sizeof(char));
+		//initialize each element to an empty string
 	       	strcpy(stringsArray[i], "");
 	}
 	
 	//open the input and output file
-	input = fopen("TestInput.txt", "r");
-	if(input == NULL){
-		printf("An error occurred when attempting to open the input file. Exiting.");
-		exit(1);
-	}
-	output = fopen("out.txt", "a");
-	if(output == NULL){
-		printf("An error occurred when attempting to open the output file. Exiting.");
-		exit(1);
-	}
+	input = fopen_errorChecked("TestInput.txt", "r");
+	output = fopen_errorChecked("out.txt", "a");
 	
-	int arraySize;
-
+	//read the strings into the strings array, growing it as needed
 	stringsArray = readFile(input, stringsArray, &arraySize);
 	
 	//sort the array
 	bubbleSort(stringsArray, arraySize); 
-	printStringArray(stringsArray, arraySize); 
-	//call writeFile
+
+	//write the sorted strings to an output file
 	writeFile(output, stringsArray, arraySize); 
+	
+	//after write, free the string array
+	freeStringArray(stringsArray, arraySize);
 	
 	//close the files
 	fclose(input);
@@ -75,15 +73,31 @@ int main(){
 }
 
 
-//malloc an array of char pointers (size = 10 initially)
+
+FILE* fopen_errorChecked(char* fileName, char* mode){
+	
+	FILE* fp = fopen(fileName, mode);
+	
+	if(fp == NULL){
+		printf("An error occurred when attempting to open the output file. Exiting.");
+		exit(1);
+	}
+	return fp;
+
+}
+
+
 
 //read file line by line; return size of array
 char** readFile(FILE* input, char** stringArray, int* outputArrSize){
 
 	//create a buffer for currentString	
 	char* currentString = (char*) malloc(101 * sizeof(char));
+	//counts how many strings have been processed
        	int stringsProcessed = 0;
+       //previous array size	
 	int prevSize = 0; 
+	//current array size
 	int currentStringArraySize = 10; 
 	
 	//whle we haven't reached the end of the file
@@ -163,5 +177,17 @@ void writeFile(FILE* output, char** sortedStringArray, int size){
 		}
 		fprintf(output, "%s\n", sortedStringArray[i]);
 	}
+
+}
+
+
+void freeStringArray(char** stringArray, int arraySize){
+	
+	//first free all of the strings
+	for(int i = 0; i < arraySize; i++){
+		free(stringArray[i]);
+	}
+	free(stringArray);
+	
 
 }
